@@ -213,4 +213,59 @@ class Solution2Test extends Specification {
         root == TreeNode.create([3, 1, null, null, 2] as Integer[])
         root2 == TreeNode.create([2, 1, 4, null, null, 3] as Integer[])
     }
+
+    def '交错字符串'() {
+        expect:
+        solution2.isInterleave(s1, s2, s3) == ret
+
+        where:
+        s1      | s2      | s3           | ret
+        "aabcc" | "dbbca" | "aadbbcbcac" | true
+    }
+
+    def '矩阵中移动的最大次数'() {
+        expect:
+        solution2.maxMoves(grid) == num
+
+        where:
+        grid                                                                                                                                                                                                                                       | num
+        [[2, 4, 3, 5], [5, 4, 9, 3], [3, 4, 2, 11], [10, 9, 13, 15]] as int[][]                                                                                                                                                                    | 3
+        [[187, 167, 209, 251, 152, 236, 263, 128, 135], [267, 249, 251, 285, 73, 204, 70, 207, 74], [189, 159, 235, 66, 84, 89, 153, 111, 189], [120, 81, 210, 7, 2, 231, 92, 128, 218], [193, 131, 244, 293, 284, 175, 226, 205, 245]] as int[][] | 3
+    }
+
+    def '递增子序列'() {
+        expect:
+        solution2.findSubsequences(nums) == ans
+
+        where:
+        nums                  | ans
+        [4, 6, 7, 7] as int[] | [[4, 6], [4, 6, 7], [4, 6, 7, 7], [4, 7], [4, 7, 7], [6, 7], [6, 7, 7], [7, 7]] as List<List<Integer>>
+    }
+
+    def '数组中最长的方波'() {
+        expect:
+        solution2.longestSquareStreak(nums) == ans
+
+        where:
+        nums                      | ans
+        [4, 9, 16, 8, 2] as int[] | 3
+    }
+
+    def '找到两个正序数组的中位数'() {
+        expect:
+        solution2.findMedianSortedArrays(nums1, nums2) == ans
+
+        where:
+        nums1              | nums2           | ans
+        [1, 3, 5] as int[] | [2, 4] as int[] | 3
+    }
+
+    def '合并K个有序链表'() {
+        expect:
+        solution2.mergeKLists(lists) == ans
+
+        where:
+        lists                                                              | ans
+        [ListNode.create(1, 2, 3), ListNode.create(2, 3, 4)] as ListNode[] | ListNode.create(1, 2, 2, 3, 3, 4)
+    }
 }

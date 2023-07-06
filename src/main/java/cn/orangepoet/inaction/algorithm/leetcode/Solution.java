@@ -1531,16 +1531,6 @@ public class Solution {
         return ans;
     }
 
-    private double getAvg(List<Integer> lst) {
-        if (lst.isEmpty()) {
-            return 0;
-        }
-        int sum = 0;
-        for (int i : lst) {
-            sum += i;
-        }
-        return sum * 1.0 / lst.size();
-    }
 
     /**
      * 计算四因数, 返回该数组中恰有四个因数的这些整数的各因数之和。
@@ -1727,8 +1717,9 @@ public class Solution {
         int n = nums.length;
         int j = 0;
         while (j < n) {
-            if (nums[j] > 0 && nums[j] <= n && nums[j] != nums[nums[j] - 1]) {
-                swap(nums, j, nums[j] - 1);
+            int move = nums[j] - 1;
+            if (nums[j] > 0 && nums[j] <= n && nums[j] != nums[move]) {
+                swap(nums, j, move);
             } else {
                 j++;
             }

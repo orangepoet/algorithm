@@ -868,4 +868,222 @@ public class Solution2 {
         left.val = right.val;
         right.val = tmp;
     }
+
+    /**
+     * 给定三个字符串 s1、s2、s3，请你帮忙验证 s3 是否是由 s1 和 s2 交错 组成的。
+     *
+     * @param s1
+     * @param s2
+     * @param s3
+     * @return
+     */
+    public boolean isInterleave(String s1, String s2, String s3) {
+        int n = s1.length(), m = s2.length(), p = s3.length();
+        if (n + m != p) {
+            return false;
+        }
+        boolean fn[][] = new boolean[n + 1][m + 1];
+        fn[0][0] = true;
+
+        for (int i = 0; i <= n; i++) {
+            for (int j = 0; j <= m; j++) {
+                int k = i + j - 1;
+                if (i > 0) {
+                    fn[i][j] = fn[i][j] || (fn[i - 1][j] && s1.charAt(i - 1) == s3.charAt(k));
+                }
+                if (j > 0) {
+                    fn[i][j] = fn[i][j] || (fn[i][j - 1] && s2.charAt(j - 1) == s3.charAt(k));
+                }
+
+            }
+        }
+        return fn[n][m];
+    }
+
+    public int matrixSum(int[][] nums) {
+        if (nums == null || nums.length == 0 || nums[0].length == 0) {
+            return 0;
+        }
+        int m = nums.length, n = nums[0].length;
+        for (int j = 0; j < m; j++) {
+            Arrays.sort(nums[j]);
+        }
+        int sum = 0;
+        for (int j = n - 1; j >= 0; j--) {
+            int max = 0;
+            for (int i = 0; i < m; i++) {
+                max = Math.max(max, nums[i][j]);
+            }
+            sum += max;
+        }
+        return sum;
+    }
+
+    public int maxMoves(int[][] grid) {
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
+            return 0;
+        }
+        int m = grid.length, n = grid[0].length;
+        int[][] f = new int[m][n];
+
+        int max = 0;
+        for (int col = 1; col < n; col++) {
+            int colMax = 0;
+            for (int row = 0; row < m; row++) {
+                for (int k = Math.max(0, row - 1); k < Math.min(m, row + 2); k++) {
+                    if (col - 1 != 0 && f[k][col - 1] == 0) {
+                        continue;
+                    }
+                    if (grid[row][col] > grid[k][col - 1]) {
+                        f[row][col] = Math.max(f[row][col], f[k][col - 1] + 1);
+                    }
+                }
+                colMax = Math.max(colMax, f[row][col]);
+            }
+            if (colMax == 0) {
+                break;
+            }
+            max = colMax;
+        }
+        return max;
+    }
+
+    public List<List<Integer>> findSubsequences(int[] nums) {
+        List<List<Integer>> ans = new ArrayList<>();
+
+        findSubsequences0(nums, 0, ans, new ArrayList<>(), Integer.MIN_VALUE);
+        return new ArrayList<>(ans);
+    }
+
+    private void findSubsequences0(int[] nums, int cur, List<List<Integer>> ans, List<Integer> seq, int prev) {
+        if (cur == nums.length) {
+            if (seq.size() > 1) {
+                ans.add(new ArrayList<>(seq));
+            }
+            return;
+        }
+
+        if (nums[cur] >= prev) {
+            List<Integer> list = new ArrayList<>(seq);
+            list.add(nums[cur]);
+            findSubsequences0(nums, cur + 1, ans, list, nums[cur]);
+        }
+        if (nums[cur] != prev) {
+            findSubsequences0(nums, cur + 1, ans, seq, prev);
+        }
+    }
+
+    /**
+     * 数组中最长的方波
+     *
+     * @param nums
+     * @return
+     */
+    public int longestSquareStreak(int[] nums) {
+        Map<Integer, Integer> map = new HashMap<>();
+        int n = nums.length;
+        int[] f = new int[n];
+        int max = 0;
+        for (int i = 0; i < n; i++) {
+            map.put((int) Math.pow(nums[i], 2), i);
+        }
+        for (int i = 0; i < n; i++) {
+            f[i] = fn(nums, f, i, map);
+            max = Math.max(f[i], max);
+        }
+        return max < 2 ? -1 : max;
+    }
+
+    private int fn(int[] nums, int[] f, int i, Map<Integer, Integer> map) {
+        if (f[i] != 0) {
+            return f[i];
+        }
+        if (map.containsKey(nums[i])) {
+            return fn(nums, f, map.get(nums[i]), map) + 1;
+        } else {
+            return 1;
+        }
+    }
+
+    /**
+     * 给定两个大小分别为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的 中位数 。
+     * 算法的时间复杂度应该为 O(log (m+n)) 。
+     *
+     * @param nums1
+     * @param nums2
+     * @return
+     */
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        int m = nums1.length, n = nums2.length;
+        int length = m + n;
+        int i = -1, j = -1;
+        int k = length % 2 == 0 ? length / 2 - 1 : length / 2;
+        while (i + j + 2 < k) {
+            int r = k - (i + j + 2) >= 2 ? (k - (i + j + 2)) / 2 : 1;
+
+            if (i < m - 1 && j < n - 1) {
+                int i1 = Math.min(i + r, m - 1);
+                int j1 = Math.min(j + r, n - 1);
+                if (nums1[i1] < nums2[j1]) {
+                    i = i1;
+                } else {
+                    j = j1;
+                }
+            } else if (i < m - 1) {
+                i = i + r;
+            } else {
+                j = j + r;
+            }
+        }
+        i++;
+        j++;
+        if (length % 2 == 0) {
+            int ret = 0;
+            for (int l = 0; l < 2; l++) {
+                if (i < m && j < n) {
+                    ret += nums1[i] < nums2[j] ? nums1[i++] : nums2[j++];
+                } else if (i < m) {
+                    ret += nums1[i++];
+                } else {
+                    ret += nums2[j++];
+                }
+
+            }
+            return ret / 2.0;
+        } else {
+            if (i < m && j < n) {
+                return Math.min(nums1[i], nums2[j]);
+            } else if (i < m) {
+                return nums1[i];
+            } else {
+                return nums2[j];
+            }
+        }
+    }
+
+    public ListNode mergeKLists(ListNode[] lists) {
+        if (lists == null || lists.length == 0) {
+            return null;
+        }
+
+        ListNode dum = new ListNode(Integer.MIN_VALUE);
+        PriorityQueue<ListNode> pq = new PriorityQueue<>(lists.length, (a, b) -> Integer.compare(a.val, b.val));
+
+        for (ListNode item : lists) {
+            if (item != null) {
+                pq.offer(item);
+            }
+        }
+        ListNode iter = dum;
+        while (!pq.isEmpty()) {
+            ListNode n = pq.poll();
+            iter.next = n;
+            iter = n;
+            if (n.next != null) {
+                pq.offer(n.next);
+            }
+        }
+        iter.next = null;
+        return dum.next;
+    }
 }
