@@ -195,7 +195,6 @@ public class Solution2 {
         return target0;
     }
 
-
     /**
      * 划分数组为连续数字的集合
      */
@@ -279,7 +278,7 @@ public class Solution2 {
         return min;
     }
 
-    //标记2
+    // 标记2
     private void dfs(int[][] grid, int i, int j, int n, int m, List<int[]> A) {
         if (!(i >= 0 && i < n && j >= 0 && j < m)) {
             return;
@@ -288,7 +287,7 @@ public class Solution2 {
             return;
         }
         grid[i][j] = 0;
-        A.add(new int[]{i, j});
+        A.add(new int[] { i, j });
         dfs(grid, i, j + 1, n, m, A);
         dfs(grid, i, j - 1, n, m, A);
         dfs(grid, i + 1, j, n, m, A);
@@ -373,7 +372,7 @@ public class Solution2 {
 
     private int plusSign0(int[][] ans, int i, int j, int n) {
         int h = 0;
-        for (int k = 0; ; k++) {
+        for (int k = 0;; k++) {
             int left = j - k;
             int right = j + k;
             if (left < 0 || right >= n || ans[i][left] == 0 || ans[i][right] == 0) {
@@ -602,9 +601,9 @@ public class Solution2 {
      */
     public void sortColors(int[] nums) {
         /**
-         *  [0,p0) 0
-         *  [p0, i)  1
-         *  (p2, n-1]  2
+         * [0,p0) 0
+         * [p0, i) 1
+         * (p2, n-1] 2
          */
         int n = nums.length;
         int p0 = 0;
@@ -757,8 +756,10 @@ public class Solution2 {
         for (int i = from; i <= to; i++) {
             List<TreeNode> lefts = makeTree(from, i - 1);
             List<TreeNode> rights = makeTree(i + 1, to);
-            if (lefts.isEmpty()) lefts.add(null);
-            if (rights.isEmpty()) rights.add(null);
+            if (lefts.isEmpty())
+                lefts.add(null);
+            if (rights.isEmpty())
+                rights.add(null);
             for (TreeNode left : lefts) {
                 for (TreeNode right : rights) {
                     TreeNode root = new TreeNode(i);
@@ -1085,5 +1086,61 @@ public class Solution2 {
         }
         iter.next = null;
         return dum.next;
+    }
+
+    public List<List<String>> solveNQueens(int n) {
+        List<int[]> list = new ArrayList<>();
+        List<List<String>> ans = new ArrayList<>();
+        int[] qs = new int[n];
+        for (int i = 0; i < qs.length; i++) {
+            qs[i] = -1;
+        }
+        solveNQueens0(list, qs, 0);
+        if (!list.isEmpty()) {
+            for (int[] each : list) {
+                List<String> resolve = new ArrayList<>();
+                for (int col : each) {
+                    char[] chars = new char[n];
+                    Arrays.fill(chars, '.');
+                    chars[col] = 'Q';
+                    resolve.add(new String(chars));
+                }
+                ans.add(resolve);
+            }
+        }
+        return ans;
+    }
+
+    private void solveNQueens0(List<int[]> list, int[] qs, int row) {
+        int n = qs.length;
+        if (row >= n) {
+            list.add(Arrays.copyOf(qs, qs.length));
+            return;
+        }
+        for (int i = 0; i < n; i++) {
+            if (!isTaken(row, i, qs)) {
+                qs[row] = i;
+                solveNQueens0(list, qs, row + 1);
+                qs[row] = -1;
+            }
+        }
+    }
+
+    private boolean isTaken(int row, int col, int[] qs) {
+        for (int r = 0; r < qs.length; r++) {
+            int c = qs[r];
+            if (c == -1) {
+                break;
+            }
+
+            if (r == row || c == col) {
+                return true;
+            }
+            double k = (row - r) / ((col - c) * 1.0);
+            if (k == 1.0 || k == -1.0) {
+                return true;
+            }
+        }
+        return false;
     }
 }
