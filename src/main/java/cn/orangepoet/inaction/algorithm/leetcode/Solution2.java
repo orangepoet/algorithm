@@ -1143,4 +1143,39 @@ public class Solution2 {
         }
         return false;
     }
+
+    /**
+     *  N 字形变换
+     * @param s
+     * @param numRows
+     * @return
+     */
+    public String convert(String s, int numRows) {
+        if (numRows == 1) {
+            return s;
+        }
+        char[] chars = s.toCharArray();
+        List<StringBuilder> rows = new ArrayList<>(numRows);
+        for (int i = 0; i < numRows; i++) {
+            rows.add(new StringBuilder());
+        }
+        int i = 0;
+        int direct = -1;
+        for (char cs : chars) {
+            rows.get(i).append(cs);
+            if(i == 0 || i == numRows-1) {
+                direct = -1 * direct;
+            }
+            i += direct;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (StringBuilder x : rows) {
+            sb.append(x.toString());    
+        }
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        new Solution2().convert("AB", 1);
+    }
 }
