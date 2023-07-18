@@ -1174,8 +1174,4 @@ public class Solution2 {
         }
         return sb.toString();
     }
-
-    public static void main(String[] args) {
-        new Solution2().convert("AB", 1);
-    }
 }

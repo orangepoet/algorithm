@@ -95,19 +95,12 @@ public class Flight implements FlightJudge {
         return this.allPosSet.contains(p);
     }
 
-    public boolean isOverlap(Flight flight) {
-        if (flight == null) {
-            return false;
-        }
-        return this.allPosSet.stream().anyMatch(flight.allPosSet::contains);
-    }
-
     public Position getHead() {
         return head;
     }
 
     public Set<Position> allPosSet() {
-        return new HashSet<>(this.allPosSet);
+        return this.allPosSet;
     }
 
     public enum Direction {

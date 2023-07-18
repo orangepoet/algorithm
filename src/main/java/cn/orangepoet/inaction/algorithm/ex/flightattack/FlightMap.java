@@ -3,6 +3,8 @@ package cn.orangepoet.inaction.algorithm.ex.flightattack;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,17 +24,41 @@ public class FlightMap {
     }
 
     public List<FlightUnit> listFlightUnits() {
+        Instant start = Instant.now();
         List<FlightUnit> result = new ArrayList<>();
 
-        for (Flight f1 : getFlightSet(null)) {
-            for (Flight f2 : getFlightSet(Arrays.asList(f1))) {
-                for (Flight f3 : getFlightSet(Arrays.asList(f1, f2))) {
-                    FlightUnit flightUnit = new FlightUnit(Arrays.asList(f1, f2, f3));
-                    result.add(flightUnit);
+        List<Flight> flightSet = getFlightSet();
+        for (Flight f1 : flightSet) {
+            for (Flight f2 : flightSet) {
+                for (Flight f3 : flightSet) {
+                    if (f1 != f2 && f2 != f3 && isOverlap(List.of(f1, f2, f3))) {
+                        FlightUnit flightUnit = new FlightUnit(Arrays.asList(f1, f2, f3));
+                        result.add(flightUnit);
+                    }
                 }
             }
         }
+        Instant end = Instant.now();
+        long millis = Duration.between(start, end).toMillis();
+        System.out.println("listFlightUnits elapse: " + millis);
         return result;
+    }
+
+    private static boolean isOverlap(List<Flight> flights) {
+        if (CollectionUtils.isEmpty(flights)) {
+            return false;
+        }
+        if (flights.size() == 1) {
+            return false;
+        }
+        Set<Position> ps = new HashSet<>();
+        for (Flight flight : flights) {
+            if (!ps.isEmpty() && flight.allPosSet().stream().anyMatch(ps::contains)) {
+                return true;
+            }
+            ps.addAll(flight.allPosSet());
+        }
+        return false;
     }
 
     public List<FlightUnit> refreshFlightUnits(List<FlightUnit> flightUnits,
@@ -63,25 +89,14 @@ public class FlightMap {
         return matchedFlightUnits;
     }
 
-    public List<Flight> getFlightSet(List<Flight> existsFlights) {
+    public List<Flight> getFlightSet() {
         List<Flight> result = new ArrayList<>();
 
         for (int y = 1; y <= size; y++) {
             for (int x = 1; x <= size; x++) {
-                List<Flight> flights = listFlightByHead(Position.get(x, y));
-
-                List<Flight> validFlights = new ArrayList<>(flights);
-
-                // 不在范围内
-                validFlights.removeIf(f -> !isInScope(f));
-
-                // 和已存在飞机重叠
-                if (CollectionUtils.isNotEmpty(existsFlights)) {
-                    validFlights.removeIf(f -> existsFlights.stream().anyMatch(f0 -> f0.isOverlap(f)));
-                }
-                if (CollectionUtils.isNotEmpty(validFlights)) {
-                    result.addAll(validFlights);
-                }
+                listFlightByHead(Position.get(x, y)).stream()
+                        .filter(this::isInScope)
+                        .forEach(result::add);
             }
         }
         return result;
