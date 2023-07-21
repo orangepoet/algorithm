@@ -1,5 +1,7 @@
 package cn.orangepoet.inaction.algorithm.ex.flightattack;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -9,26 +11,34 @@ import java.util.Set;
  * @author chengzhi
  * @date 2019/10/24
  */
-public class Flight implements FlightJudge {
+@Getter
+public class Flight {
     private final Position head;
 
-    private final Set<Position> allPosSet = new HashSet<>();
+    private final Direction direction;
+
+    private final Set<Position> body;
+
+    private final Set<Position> positions;
 
     private static final Map<String, Flight> FLIGHT_CACHE = new HashMap<>();
 
     private Flight(Position head,
+                   Direction direction,
                    Set<Position> body) {
         this.head = head;
+        this.direction = direction;
+        this.body = body;
 
-        allPosSet.addAll(body);
-        allPosSet.add(head);
+        positions = new HashSet<>(body);
+        positions.add(head);
     }
 
     public static Flight get(Direction direction, Position head) {
         String key = String.format("%s-%s", direction, head.toString());
         Flight flight = FLIGHT_CACHE.get(key);
         if (flight == null) {
-            flight = new Flight(head, getBody(head, direction));
+            flight = new Flight(head, direction, getBody(head, direction));
             FLIGHT_CACHE.put(key, flight);
         }
         return flight;
@@ -80,28 +90,6 @@ public class Flight implements FlightJudge {
         return body;
     }
 
-    @Override
-    public boolean isHead(Position p) {
-        return this.head.equals(p);
-    }
-
-    @Override
-    public boolean isBody(Position p) {
-        return this.allPosSet.contains(p) && !this.head.equals(p);
-    }
-
-    @Override
-    public boolean hasPos(Position p) {
-        return this.allPosSet.contains(p);
-    }
-
-    public Position getHead() {
-        return head;
-    }
-
-    public Set<Position> allPosSet() {
-        return this.allPosSet;
-    }
 
     public enum Direction {
         LEFT,

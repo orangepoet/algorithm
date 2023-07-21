@@ -10,7 +10,6 @@ import java.util.Map;
 public record Position(int x, int y) {
     private final static Map<String, Position> POSITION_MAP = new HashMap<>();
 
-
     @Override
     public String toString() {
         return String.format("(%d, %d)", x, y);

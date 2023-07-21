@@ -508,7 +508,6 @@ class SolutionTest extends Specification {
         [2, 3, 1, 1, 4] as int[] | true
         [3, 2, 1, 0, 4] as int[] | false
         [1, 2, 3] as int[]       | true
-        [3, 2, 1, 0, 4] as int[] | false
         [2, 5, 0, 0] as int[]    | true
     }
 
