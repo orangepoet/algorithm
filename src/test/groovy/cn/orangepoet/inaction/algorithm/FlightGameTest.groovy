@@ -9,7 +9,7 @@ import spock.lang.Specification
 /**
  * @author chengzhi* @date 2019/10/24
  */
-class FlightMapTest extends Specification {
+class FlightGameTest extends Specification {
 
 
     def "TestGuess1"() {

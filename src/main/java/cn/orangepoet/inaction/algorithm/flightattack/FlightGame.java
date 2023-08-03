@@ -1,12 +1,11 @@
 package cn.orangepoet.inaction.algorithm.flightattack;
 
 import lombok.Getter;
-import org.apache.commons.collections4.MapUtils;
+import lombok.NonNull;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author chengzhi
@@ -14,10 +13,22 @@ import java.util.stream.Collectors;
  */
 @Getter
 public class FlightGame {
+
+    static class TreeNode {
+        TreeNode parent;
+        Flight flight;
+        List<TreeNode> children = new ArrayList<>();
+
+        public TreeNode(Flight f, TreeNode p) {
+            this.flight = f;
+            this.parent = p;
+        }
+    }
+
     private final int mapSize;
     private final int groupSize;
     private final List<Flight> allFlights = new ArrayList<>();
-    private final List<List<Flight>> flightsList = new ArrayList<>();
+    private final TreeNode root = new TreeNode(null, null);
 
     private int guessTime = 0;
 
@@ -25,7 +36,7 @@ public class FlightGame {
         this.mapSize = mapSize;
         this.groupSize = groupSize;
         initFlightSet();
-        initFlightGroups();
+        initTree();
     }
 
     public void initFlightSet() {
@@ -38,95 +49,149 @@ public class FlightGame {
         }
     }
 
-    private void initFlightGroups() {
+    private void initTree() {
         Instant start = Instant.now();
-
-
-        listFlightUnits0(new ArrayList<>());
+        initTree0(0, 0, root);
 
         Instant end = Instant.now();
-        long millis = Duration.between(start, end).toMillis();
-        System.out.println("initFlightGroups elapse: " + millis);
+        System.out.println("initFlightGroups elapse: " + Duration.between(start, end).toMillis());
     }
 
-    private void listFlightUnits0(List<Flight> flights) {
-        if (flights.size() == this.groupSize) {
-            this.flightsList.add(new ArrayList<>(flights));
-            return;
+
+    /**
+     * @param depth max: groupSize - 1
+     * @param seq
+     * @param n
+     */
+    private boolean initTree0(int depth, int seq, @NonNull TreeNode n) {
+        if (depth == groupSize) {
+            return true;
         }
-        Set<Position> groupPositions = flights.stream()
-                .flatMap(f -> f.getPositions().stream())
-                .collect(Collectors.toSet());
-        for (Flight f : this.allFlights) {
-            if (f.getPositions().stream().noneMatch(groupPositions::contains)) {
-                flights.add(f);
-                listFlightUnits0(flights);
-                flights.remove(f);
+
+        Set<Position> positions = new HashSet<>();
+        TreeNode p = n;
+        while (p != null && p.flight != null) {
+            positions.addAll(p.flight.getPositions());
+            p = p.parent;
+        }
+
+        for (int i = seq; i < this.allFlights.size(); i++) {
+            Flight f = this.allFlights.get(i);
+
+            if (f.getPositions().stream().noneMatch(positions::contains)) {
+                TreeNode c = new TreeNode(f, n);
+                boolean reachEnd = initTree0(depth + 1, i + 1, c);
+                if (reachEnd) {
+                    n.children.add(c);
+                }
             }
         }
+        return !n.children.isEmpty();
     }
+
 
     private void refresh(Position p, MatchResult matchedResult) {
         switch (matchedResult) {
-            case NONE ->
-                // 排除这个点P!=None的, [Head, Body]
-                    this.flightsList.removeIf(flights ->
-                            flights.stream().anyMatch(f -> f.getPositions().contains(p))
-                    );
-            case BODY -> {
-                // 排除这个点P=Head的
-                this.flightsList.removeIf(flights ->
-                        flights.stream().anyMatch(f -> p.equals(f.getHead()))
-                );
-                // 排除这个点P=None的
-                this.flightsList.removeIf(flights ->
-                        flights.stream().noneMatch(f -> f.getBody().contains(p))
-                );
-            }
-            case HEAD -> {
-                // 排除这个点P=Body的
-                this.flightsList.removeIf(flights ->
-                        flights.stream().anyMatch(f -> f.getBody().contains(p))
-                );
-                // 排除这个点P=None的
-                this.flightsList.removeIf(flights ->
-                        flights.stream().anyMatch(f -> f.getBody().contains(p))
-                );
+            case NONE -> cleanIfFound(p, root);
+            case BODY -> cleanIfBodyNotFound(p, root);
+            case HEAD -> cleanIfHeadNotFound(p, root);
+        }
+    }
+
+    private void cleanIfFound(Position p, TreeNode node) {
+        if (node.flight != null && node.flight.getPositions().contains(p)) {
+            remove0(node.parent, node);
+            return;
+        }
+        List<TreeNode> copy = new ArrayList<>(node.children);
+        for (TreeNode child : copy) {
+            cleanIfFound(p, child);
+        }
+    }
+
+    private void cleanIfBodyNotFound(Position p, TreeNode node) {
+        if (node.flight != null && node.flight.getBody().contains(p)) {
+            return;
+        }
+        if (node.children.isEmpty()) {
+            remove0(node.parent, node);
+        } else {
+            List<TreeNode> copy = new ArrayList<>(node.children);
+            for (TreeNode child : copy) {
+                cleanIfBodyNotFound(p, child);
             }
         }
     }
+
+    private void cleanIfHeadNotFound(Position p, TreeNode node) {
+        if (node.flight != null && node.flight.getHead().equals(p)) {
+            return;
+        }
+        if (node.children.isEmpty()) {
+            remove0(node.parent, node);
+        } else {
+            List<TreeNode> copy = new ArrayList<>(node.children);
+            for (TreeNode child : copy) {
+                cleanIfHeadNotFound(p, child);
+            }
+        }
+    }
+
+    private void remove0(TreeNode p, TreeNode c) {
+        if (p == null || c == null) {
+            return;
+        }
+        p.children.remove(c);
+        if (p.children.isEmpty()) {
+            remove0(p.parent, p);
+        }
+    }
+
 
     public List<Flight> listFlightByHead(Position head) {
         return Arrays.asList(
                 Flight.get(Flight.Direction.UP, head),
                 Flight.get(Flight.Direction.DOWN, head),
                 Flight.get(Flight.Direction.LEFT, head),
-                Flight.get(Flight.Direction.RIGHT, head)
-        );
+                Flight.get(Flight.Direction.RIGHT, head));
     }
 
     public boolean isInScope(Flight flight) {
-        return flight.getPositions().stream().allMatch(p ->
-                p.x() >= 1 && p.x() <= mapSize && p.y() >= 1 && p.y() <= mapSize);
+        return flight.getPositions().stream()
+                .allMatch(p -> p.x() >= 1 && p.x() <= mapSize && p.y() >= 1 && p.y() <= mapSize);
     }
 
-    public Position guessNext(Set<Position> hintPosSet) {
-        Map<Position, Long> posCntMap = flightsList
-                .stream()
-                .flatMap(Collection::stream)
-                .map(Flight::getHead)
-                .filter(p -> !hintPosSet.contains(p))
-                .collect(Collectors.groupingBy(h -> h, Collectors.counting()));
-        if (MapUtils.isEmpty(posCntMap)) {
-            return null;
+    public Position guessNext(Set<Position> history) {
+        Map<Position, Integer> pMap = new HashMap<>();
+        statPos(pMap, root, history);
+
+        Position p = pMap.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+        return p;
+    }
+
+    private void statPos(Map<Position, Integer> pMap, TreeNode node, Set<Position> history) {
+        if (node.flight != null && !history.contains(node.flight.getHead())) {
+            pMap.compute(node.flight.getHead(), (k, v) -> v == null ? 1 : v + 1);
         }
-        Optional<Map.Entry<Position, Long>> hintPos = posCntMap.entrySet().stream().max(
-                Comparator.comparing(Map.Entry::getValue));
-        Position position = hintPos.map(Map.Entry::getKey).orElse(null);
-        hintPosSet.add(position);
-        return position;
+
+        for (TreeNode child : node.children) {
+            statPos(pMap, child, history);
+        }
     }
 
+    private int count(TreeNode n) {
+        if (n.children.isEmpty()) {
+            return 1;
+        }
+        int sum = 0;
+        for (TreeNode c : n.children) {
+            sum += count(c);
+        }
+        return sum;
+    }
 
     public boolean guess(List<Flight> flights) {
         List<Flight> aimFlights = new ArrayList<>(flights);
@@ -137,6 +202,8 @@ public class FlightGame {
             if (np == null) {
                 return false;
             }
+
+            history.add(np);
             guessTime++;
             MatchResult matchResult = MatchResult.judgePosition(np, flights);
 
@@ -151,9 +218,10 @@ public class FlightGame {
             }
 
             refresh(np, matchResult);
-            System.out.println("left case size: " + flightsList.size());
+            int leftCount = count(root);
+            System.out.println("left case size: " + leftCount);
 
-            if (flightsList.size() <= 1) {
+            if (leftCount == 0) {
                 return false;
             }
         }

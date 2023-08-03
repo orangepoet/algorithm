@@ -90,6 +90,18 @@ public class Flight {
         return body;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Flight f2) {
+            return f2.head.equals(this.head) && f2.direction == this.direction;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + this.direction + this.head.toString() + "]";
+    }
 
     public enum Direction {
         LEFT,
