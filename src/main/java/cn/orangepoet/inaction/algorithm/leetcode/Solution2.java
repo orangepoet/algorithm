@@ -1,6 +1,18 @@
 package cn.orangepoet.inaction.algorithm.leetcode;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 public class Solution2 {
     /**
@@ -1145,7 +1157,8 @@ public class Solution2 {
     }
 
     /**
-     *  N 字形变换
+     * N 字形变换
+     *
      * @param s
      * @param numRows
      * @return
@@ -1163,14 +1176,14 @@ public class Solution2 {
         int direct = -1;
         for (char cs : chars) {
             rows.get(i).append(cs);
-            if(i == 0 || i == numRows-1) {
+            if (i == 0 || i == numRows - 1) {
                 direct = -1 * direct;
             }
             i += direct;
         }
         StringBuilder sb = new StringBuilder();
         for (StringBuilder x : rows) {
-            sb.append(x.toString());    
+            sb.append(x.toString());
         }
         return sb.toString();
     }
