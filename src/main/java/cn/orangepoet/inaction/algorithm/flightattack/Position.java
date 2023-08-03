@@ -1,4 +1,4 @@
-package cn.orangepoet.inaction.algorithm.ex.flightattack;
+package cn.orangepoet.inaction.algorithm.flightattack;
 
 import java.util.HashMap;
 import java.util.Map;

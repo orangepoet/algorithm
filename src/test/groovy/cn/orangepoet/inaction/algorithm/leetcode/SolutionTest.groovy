@@ -1,6 +1,8 @@
 package cn.orangepoet.inaction.algorithm.leetcode
 
-
+import cn.orangepoet.inaction.algorithm.leetcode.ListNode
+import cn.orangepoet.inaction.algorithm.leetcode.Solution
+import cn.orangepoet.inaction.algorithm.leetcode.TreeNode
 import spock.lang.Specification
 
 /**

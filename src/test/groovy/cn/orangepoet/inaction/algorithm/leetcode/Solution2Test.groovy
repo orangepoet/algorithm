@@ -239,7 +239,14 @@ class Solution2Test extends Specification {
 
         where:
         nums                  | ans
-        [4, 6, 7, 7] as int[] | [[4, 6], [4, 6, 7], [4, 6, 7, 7], [4, 7], [4, 7, 7], [6, 7], [6, 7, 7], [7, 7]] as List<List<Integer>>
+        [4, 6, 7, 7] as int[] | [[4, 6, 7, 7],
+                                 [4, 6, 7],
+                                 [4, 6],
+                                 [4, 7, 7],
+                                 [4, 7],
+                                 [6, 7, 7],
+                                 [6, 7],
+                                 [7, 7]] as List<List<Integer>>
     }
 
     def '数组中最长的方波'() {

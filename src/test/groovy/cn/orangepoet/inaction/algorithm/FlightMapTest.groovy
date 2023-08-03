@@ -1,9 +1,9 @@
-package cn.orangepoet.inaction.algorithm.ex
+package cn.orangepoet.inaction.algorithm
 
 
-import cn.orangepoet.inaction.algorithm.ex.flightattack.Flight
-import cn.orangepoet.inaction.algorithm.ex.flightattack.FlightGame
-import cn.orangepoet.inaction.algorithm.ex.flightattack.Position
+import cn.orangepoet.inaction.algorithm.flightattack.Flight
+import cn.orangepoet.inaction.algorithm.flightattack.FlightGame
+import cn.orangepoet.inaction.algorithm.flightattack.Position
 import spock.lang.Specification
 
 /**

@@ -1,4 +1,4 @@
-package cn.orangepoet.inaction.algorithm.exam;
+package cn.orangepoet.inaction.algorithm;
 
 import java.util.ArrayList;
 import java.util.List;
