@@ -1,17 +1,21 @@
 package cn.orangepoet.inaction.algorithm.flightattack;
 
-import lombok.Getter;
 import lombok.NonNull;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author chengzhi
  * @date 2019/10/24
  */
-@Getter
 public class FlightGame {
 
     static class TreeNode {
@@ -39,7 +43,7 @@ public class FlightGame {
         initTree();
     }
 
-    public void initFlightSet() {
+    private void initFlightSet() {
         for (int y = 1; y <= mapSize; y++) {
             for (int x = 1; x <= mapSize; x++) {
                 listFlightByHead(Position.get(x, y)).stream()
@@ -148,7 +152,7 @@ public class FlightGame {
     }
 
 
-    public List<Flight> listFlightByHead(Position head) {
+    private List<Flight> listFlightByHead(Position head) {
         return Arrays.asList(
                 Flight.get(Flight.Direction.UP, head),
                 Flight.get(Flight.Direction.DOWN, head),
@@ -156,12 +160,12 @@ public class FlightGame {
                 Flight.get(Flight.Direction.RIGHT, head));
     }
 
-    public boolean isInScope(Flight flight) {
+    private boolean isInScope(Flight flight) {
         return flight.getPositions().stream()
                 .allMatch(p -> p.x() >= 1 && p.x() <= mapSize && p.y() >= 1 && p.y() <= mapSize);
     }
 
-    public Position guessNext(Set<Position> history) {
+    private Position guessNext(Set<Position> history) {
         Map<Position, Integer> pMap = new HashMap<>();
         statPos(pMap, root, history);
 
