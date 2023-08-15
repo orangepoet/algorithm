@@ -1,4 +1,4 @@
-package cn.orangepoet.inaction.algorithm;
+package cn.orangepoet.inaction.algorithm.elimination;
 
 import java.util.HashMap;
 import java.util.Map;

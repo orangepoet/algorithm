@@ -1,5 +1,8 @@
-package cn.orangepoet.inaction.algorithm.leetcode
+package cn.orangepoet.inaction.algorithm
 
+import cn.orangepoet.inaction.algorithm.leetcode.ListNode
+import cn.orangepoet.inaction.algorithm.leetcode.Solution2
+import cn.orangepoet.inaction.algorithm.leetcode.TreeNode
 import spock.lang.Specification
 
 import static cn.orangepoet.inaction.algorithm.leetcode.Functions.isSorted
@@ -274,5 +277,18 @@ class Solution2Test extends Specification {
         where:
         lists                                                              | ans
         [ListNode.create(1, 2, 3), ListNode.create(2, 3, 4)] as ListNode[] | ListNode.create(1, 2, 2, 3, 3, 4)
+    }
+
+    def '最长滑雪距离'() {
+        expect:
+        solution2.ski(high) == max
+        where:
+        high               | max
+        [
+                [4, 5, 4],
+                [3, 4, 3],
+                [2, 3, 2],
+        ] as int[][]       | 4
+
     }
 }

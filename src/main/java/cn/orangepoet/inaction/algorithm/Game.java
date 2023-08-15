@@ -8,7 +8,6 @@ import java.util.List;
  */
 public class Game {
     /**
-     * 
      * @param node  博弈树
      * @param alpha 我方期望的最大值
      * @param beta  对方期望的最小值
@@ -43,25 +42,25 @@ public class Game {
         node.val = bestValue;
         return bestValue;
     }
-}
 
-class Node {
-    int val;
-    List<Node> children;
+    static class Node {
+        int val;
+        List<Node> children;
 
-    Node(Node... nodes) {
-        this.children = Arrays.asList(nodes);
-    }
-
-    Node(int val) {
-        this.val = val;
-    }
-
-    String getChildValue() {
-        StringBuilder sb = new StringBuilder();
-        for (Node node : children) {
-            sb.append(-1 * node.val).append(",");
+        Node(Node... nodes) {
+            this.children = Arrays.asList(nodes);
         }
-        return sb.toString();
+
+        Node(int val) {
+            this.val = val;
+        }
+
+        String getChildValue() {
+            StringBuilder sb = new StringBuilder();
+            for (Node node : children) {
+                sb.append(-1 * node.val).append(",");
+            }
+            return sb.toString();
+        }
     }
 }

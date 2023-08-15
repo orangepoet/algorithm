@@ -2,16 +2,17 @@ package cn.orangepoet.inaction.algorithm;
 
 import lombok.Getter;
 
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Stack;
 import java.util.concurrent.ArrayBlockingQueue;
 
-/**
- * 树的操作, 左子树的值都小于右子树
- *
- * @author Orange
- * @date 16/8/27.
- */
+
 public class TreeAlgo {
     @Getter
     static class Node {
@@ -29,55 +30,12 @@ public class TreeAlgo {
             this.right = right;
         }
 
-        public void setLeft(Node left) {
-            this.left = left;
-        }
-
-        public void setRight(Node right) {
-            this.right = right;
-        }
-
-        /**
-         * [1,2,3,4,5,6,7]
-         *
-         * @param elements
-         * @return
-         */
-        public static Node parse(Integer[] elements) {
-            if (elements == null || elements.length == 0) {
-                return null;
-            }
-            Node root = null;
-            int maxDeep = (int) (Math.log(elements.length + 1) / Math.log(2));
-            for (int deep = 1; deep <= maxDeep; deep++) {
-                Node current;
-                int index = (int) Math.pow(2, deep - 1);
-                if (deep != maxDeep) {
-                    Node left = null;
-                    Node right = null;
-                    if (elements[index * 2 + 1] != null) {
-                        left = new Node(elements[index * 2 + 1]);
-                    }
-                    if (elements[index * 2 + 2] != null) {
-                        right = new Node(elements[index * 2 + 2]);
-                    }
-                    current = new Node(elements[index], left, right);
-                } else {
-                    current = new Node(elements[index]);
-                }
-
-                if (deep == 1) {
-                    root = current;
-                }
-            }
-            return root;
-        }
     }
 
     /**
      * 堆是一种完全二叉树, 是由满二叉树衍生而来
      */
-    public static class Heap {
+    static class Heap {
         private int[] element;
         private int current = -1;
 
@@ -115,7 +73,7 @@ public class TreeAlgo {
             }
         }
 
-        private int findMin() {
+        public int findMin() {
             if (isEmpty()) {
                 return -1;
             }
@@ -143,9 +101,7 @@ public class TreeAlgo {
         private void ensureForAdd() {
             if (current == element.length - 1) {
                 int[] copy = new int[element.length * 2];
-                for (int i = 0; i < element.length; i++) {
-                    copy[i] = element[i];
-                }
+                System.arraycopy(element, 0, copy, 0, element.length);
                 element = copy;
             }
         }
@@ -154,144 +110,115 @@ public class TreeAlgo {
             return size() < 2;
         }
 
-        public static void main(String[] args) {
-            int[] arr = new int[]{150, 80, 40, 20, 10, 50, 110, 100, 30, 90, 60, 70, 120, 140, 130};
-            Heap heap = new Heap(arr);
-            printHeap(heap);
-            System.out.println(String.format("min element: %d", heap.findMin()));
-        }
-
-        private static void printHeap(Heap heap) {
-            if (heap.isEmpty()) {
-                return;
+        @Override
+        public String toString() {
+            if (this.isEmpty()) {
+                return "";
             }
-            System.out.println("------------------------------");
-            for (int i = 1; i < heap.size(); i++) {
-                if (heap.get(i) == 0) {
+            StringBuilder s = new StringBuilder();
+            s.append("------------------------------");
+            s.append(System.lineSeparator());
+            for (int i = 1; i < this.size(); i++) {
+                if (this.get(i) == 0) {
                     break;
                 }
 
                 int step = (int) Math.floor(Math.log(i) / Math.log(2));
-                StringBuilder sb = new StringBuilder();
-                for (int j = 0; j < step; j++) {
-                    sb.append("-");
-                }
-
-                System.out.println(String.format("%s[%d]", sb.toString(), heap.get(i)));
+                s.append("-".repeat(step));
+                s.append(this.get(i));
+                s.append(System.lineSeparator());
             }
-            System.out.println();
+            return s.toString();
         }
     }
 
     /**
-     * 二分查找, 小于走左, 大于走右
-     *
-     * @param node
-     * @param x
-     * @return
+     * 树的操作, 左子树的值都小于右子树
      */
-    public static boolean contain(Node node, int x) {
-        if (node == null) {
-            return false;
-        }
+    static class SearchTree {
+        /**
+         * 递归查找到x所在的子树, 如果就是当前节点 ->
+         * <p>
+         * 1. 从右子树选一个最小的作为 root
+         * </p>
+         * <p>
+         * 2. 从右子树中 删除1中的root节点, 递归下去 ->1
+         * </p>
+         *
+         * @param node
+         * @param x
+         * @return
+         */
+        public static Node remove(Node node, int x) {
+            if (node == null) {
+                return node;
+            }
 
-        Node t = node;
-        while (t != null) {
-            if (x < t.element) {
-                t = t.left;
-            } else if (x > t.element) {
-                t = t.right;
+            if (x < node.element) {
+                node.left = remove(node.left, x);
+            } else if (x > node.element) {
+                node.right = remove(node.right, x);
+            } else if (node.left != null && node.right != null) {
+                node.element = findMin(node.right).element;
+                node.right = remove(node.right, node.element);
             } else {
-                return true;
+                node = (node.left != null) ? node.left : node.right;
             }
-        }
-        return false;
-    }
-
-    /**
-     * 递归查找到x所在的子树, 如果就是当前节点 ->
-     * <p>
-     * 1. 从右子树选一个最小的作为 root
-     * </p>
-     * <p>
-     * 2. 从右子树中 删除1中的root节点, 递归下去 ->1
-     * </p>
-     *
-     * @param node
-     * @param x
-     * @return
-     */
-    public static Node remove(Node node, int x) {
-        if (node == null) {
             return node;
         }
 
-        if (x < node.element) {
-            node.left = remove(node.left, x);
-        } else if (x > node.element) {
-            node.right = remove(node.right, x);
-        } else if (node.left != null && node.right != null) {
-            node.element = findMin(node.right).element;
-            node.right = remove(node.right, node.element);
-        } else {
-            node = (node.left != null) ? node.left : node.right;
-        }
-        return node;
-    }
-
-    public static Node findMin(Node node) {
-        if (node != null) {
-            while (node.left != null) {
+        public static Node findMin(Node node) {
+            while (node != null && node.left != null) {
                 node = node.left;
             }
-        }
-        return node;
-    }
-
-    public static Node add(int x, Node node) {
-        if (node == null) {
-            return new Node(x, null, null);
+            return node;
         }
 
-        if (x < node.element) {
-            node.left = add(x, node.left);
-        } else if (x > node.element) {
-            node.right = add(x, node.right);
-        } else {
-            // do nothing, duplicate
-        }
-        return node;
-    }
+        public static Node add(int x, Node node) {
+            if (node == null) {
+                return new Node(x, null, null);
+            }
 
-    public static void add0(int x, Node node) {
-        if (node == null)
-        //            return new BinaryNode(x, null, null);
-        {
-            throw new NullPointerException("node");
-        }
-
-        Node t = node;
-
-        while (t != null) {
-            if (x < t.element) {
-                if (t.left != null) {
-                    t = t.left;
-                } else {
-                    t.left = new Node(x, null, null);
-                    break;
-                }
-            } else if (x > t.element) {
-                if (t.right != null) {
-                    t = t.right;
-                } else {
-                    t.right = new Node(x, null, null);
-                    break;
-                }
+            if (x < node.element) {
+                node.left = add(x, node.left);
+            } else if (x > node.element) {
+                node.right = add(x, node.right);
             } else {
                 // do nothing, duplicate
             }
+            return node;
+        }
+
+        public static void add0(int x, Node node) {
+            if (node == null) {
+                throw new NullPointerException("node");
+            }
+
+            Node t = node;
+
+            while (true) {
+                if (x < t.element) {
+                    if (t.left != null) {
+                        t = t.left;
+                    } else {
+                        t.left = new Node(x, null, null);
+                        break;
+                    }
+                } else if (x > t.element) {
+                    if (t.right != null) {
+                        t = t.right;
+                    } else {
+                        t.right = new Node(x, null, null);
+                        break;
+                    }
+                } else {
+                    // do nothing, duplicate
+                    break;
+                }
+            }
         }
     }
+
 
     /**
      * 广度优先遍历, 使用队列实现
@@ -321,17 +248,18 @@ public class TreeAlgo {
     }
 
     /**
-     * 深度优先遍历, 使用栈实现
+     * 先序遍历, 先根后子
      *
      * @param node
      */
-    public static void dfs(Node node) {
-        Stack<Node> stack = new Stack<Node>();
+    public static List<Integer> preOrder(Node node) {
+        Deque<Node> stack = new LinkedList<>();
 
         stack.push(node);
-        while (!stack.empty()) {
+        List<Integer> result = new ArrayList<>();
+        while (!stack.isEmpty()) {
             Node node1 = stack.pop();
-            System.out.println(node1.element);
+            result.add(node1.element);
 
             if (node1.right != null) {
                 stack.push(node1.right);
@@ -340,20 +268,52 @@ public class TreeAlgo {
                 stack.push(node1.left);
             }
         }
-
-        BigDecimal x = new BigDecimal("");
+        return result;
     }
 
     /**
-     * 先序遍历
+     * 先序遍历, 先根后子
      *
      * @param node
      */
-    public static void parentFirst(Node node) {
+    public static void preOrder2(Node node, List<Integer> list) {
         if (node != null) {
-            System.out.println(node.element);
-            parentFirst(node.left);
-            parentFirst(node.right);
+            list.add(node.element);
+            preOrder2(node.left, list);
+            preOrder2(node.right, list);
+        }
+    }
+
+    /**
+     * 中序遍历, 左 -> 中 -> 右
+     *
+     * @param node
+     * @return
+     */
+    public static List<Integer> inorder(Node node) {
+        List<Integer> list = new ArrayList<>();
+
+        Deque<Node> stack = new ArrayDeque<>();
+
+        Node n = node;
+        while (n != null || !stack.isEmpty()) {
+            while (n != null) {
+                stack.push(n);
+                n = n.left;
+            }
+
+            n = stack.pop();
+            list.add(n.element);
+            n = n.right;
+        }
+        return list;
+    }
+
+    public static void inorder2(Node node, List<Integer> list) {
+        if (node != null) {
+            inorder2(node.left, list);
+            list.add(node.element);
+            inorder2(node.right, list);
         }
     }
 
@@ -361,84 +321,45 @@ public class TreeAlgo {
      * 后序遍历, 先子树后根节点
      *
      * @param node
-     */
-    public static void ChildrenFirst(Node node) {
-        if (node != null) {
-            ChildrenFirst(node.left);
-            ChildrenFirst(node.right);
-            System.out.println(node.element);
-        }
-    }
-
-    /**
-     * 树的序列化
-     *
-     * @param root
      * @return
      */
-    public String serialize(Node root) {
-        if (root == null) {
-            return "";
+    public static List<Integer> postOrder(Node node) {
+        List<Integer> result = new ArrayList<>();
+        if (node == null) {
+            return result;
         }
-        Queue<Node> nodeQueue = new ArrayDeque<>();
-        nodeQueue.add(root);
 
-        Node emptyNode = new Node(-1);
+        Stack<Node> stack = new Stack<>();
+        Node current = node;
+        Node lastVisited = null;
 
-        List<Integer> values = new ArrayList<>();
-        while (nodeQueue.peek() != null) {
-            Node node = nodeQueue.poll();
-            values.add(node.element);
-
-            if (node.left != null) {
-                nodeQueue.add(node.left);
-            } else if (node != emptyNode) {
-                nodeQueue.add(emptyNode);
-            }
-
-            if (node.right != null) {
-                nodeQueue.add(node.right);
-            } else if (node != emptyNode) {
-                nodeQueue.add(emptyNode);
-            }
-        }
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < values.size(); i++) {
-            if (i == 0) {
-                result.append(values.get(i));
+        while (current != null || !stack.isEmpty()) {
+            if (current != null) {
+                stack.push(current);
+                current = current.left;
             } else {
-                result.append("_").append(values.get(i));
-            }
-        }
-        return result.toString();
-    }
-
-    /**
-     * 树的反序列化
-     *
-     * @param data
-     * @return
-     */
-    public Node deserialize(String data) {
-        String[] parts = data.split("_");
-        Map<Integer, Node> treeMap = new HashMap<>();
-        for (int i = 0; i < parts.length; i++) {
-            int val = Integer.parseInt(parts[i]);
-            if (val == -1) {
-                continue;
-            }
-            Node node = new Node(val);
-            treeMap.put(i, node);
-            if (i > 0) {
-                int pIndex = (i + 1) / 2 - 1;
-                boolean mod = (i + 1) % 2 == 0;
-                if (mod) {
-                    treeMap.get(pIndex).left = node;
+                Node peekNode = stack.peek();
+                if (peekNode.right != null && peekNode.right != lastVisited) {
+                    current = peekNode.right;
                 } else {
-                    treeMap.get(pIndex).right = node;
+                    result.add(peekNode.element);
+                    lastVisited = stack.pop();
                 }
             }
         }
-        return treeMap.get(0);
+        return result;
+    }
+
+    /**
+     * 后序遍历, 先子树后根节点
+     *
+     * @param node
+     */
+    public static void postOrder2(Node node, List<Integer> list) {
+        if (node != null) {
+            postOrder2(node.left, list);
+            postOrder2(node.right, list);
+            list.add(node.element);
+        }
     }
 }

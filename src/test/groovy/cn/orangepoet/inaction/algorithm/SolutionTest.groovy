@@ -1,4 +1,4 @@
-package cn.orangepoet.inaction.algorithm.leetcode
+package cn.orangepoet.inaction.algorithm
 
 import cn.orangepoet.inaction.algorithm.leetcode.ListNode
 import cn.orangepoet.inaction.algorithm.leetcode.Solution

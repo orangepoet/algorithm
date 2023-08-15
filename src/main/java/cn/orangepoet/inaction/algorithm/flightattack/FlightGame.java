@@ -231,7 +231,7 @@ public class FlightGame {
         }
     }
 
-    public enum MatchResult {
+    enum MatchResult {
         UNKNOWN,
         NONE,
         BODY,

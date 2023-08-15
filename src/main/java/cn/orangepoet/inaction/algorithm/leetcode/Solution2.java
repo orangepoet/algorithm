@@ -299,7 +299,7 @@ public class Solution2 {
             return;
         }
         grid[i][j] = 0;
-        A.add(new int[] { i, j });
+        A.add(new int[]{i, j});
         dfs(grid, i, j + 1, n, m, A);
         dfs(grid, i, j - 1, n, m, A);
         dfs(grid, i + 1, j, n, m, A);
@@ -384,7 +384,7 @@ public class Solution2 {
 
     private int plusSign0(int[][] ans, int i, int j, int n) {
         int h = 0;
-        for (int k = 0;; k++) {
+        for (int k = 0; ; k++) {
             int left = j - k;
             int right = j + k;
             if (left < 0 || right >= n || ans[i][left] == 0 || ans[i][right] == 0) {
@@ -1186,5 +1186,53 @@ public class Solution2 {
             sb.append(x.toString());
         }
         return sb.toString();
+    }
+
+    /**
+     * 滑雪, 求最远距离
+     *
+     * @return
+     */
+    public int ski(int[][] high) {
+        if (high == null || high.length == 0 || high[0].length == 0) {
+            return 0;
+        }
+        int max = 0;
+        int r = high.length, c = high[0].length;
+        int[][] value = new int[r][c];
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                max = Math.max(max, ski0(i, j, Integer.MAX_VALUE, high, value));
+            }
+        }
+        return max;
+    }
+
+    private int ski0(int row, int col, int prev, int[][] high, int[][] value) {
+        System.out.println("row: " + row + ", col: " + col);
+        //出了矩阵的区域或者现在arr这个点的值大于上一个arr点的值，即跑到更高的点去了，无效，返回0
+        if (high[row][col] >= prev) {
+            return 0;
+        }
+        //若已经计算过了此arr点的“滑雪长度”，直接返回
+        if (value[row][col] > 0) {
+            return value[row][col];
+        }
+        //不然就计算此点的“滑雪长度” = 上下左右的点的“滑雪长度”的最大值 + 1
+        int max = 0;
+        if (row - 1 >= 0) {
+            max = Math.max(max, ski0(row - 1, col, high[row][col], high, value) + 1);
+        }
+        if (row + 1 < high.length) {
+            max = Math.max(max, ski0(row + 1, col, high[row][col], high, value) + 1);
+        }
+        if (col - 1 >= 0) {
+            max = Math.max(max, ski0(row, col - 1, high[row][col], high, value) + 1);
+        }
+        if (col + 1 < high[0].length) {
+            max = Math.max(max, ski0(row, col + 1, high[row][col], high, value) + 1);
+        }
+        value[row][col] = max;
+        return max;
     }
 }

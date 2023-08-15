@@ -1,5 +1,7 @@
 package cn.orangepoet.inaction.algorithm
 
+import cn.orangepoet.inaction.algorithm.elimination.LFU
+import cn.orangepoet.inaction.algorithm.elimination.LRU2
 import spock.lang.Specification
 
 class LFUTest extends Specification {

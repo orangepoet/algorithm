@@ -1,4 +1,4 @@
-package cn.orangepoet.inaction.algorithm;
+package cn.orangepoet.inaction.algorithm.interviews;
 
 import lombok.extern.slf4j.Slf4j;
 
