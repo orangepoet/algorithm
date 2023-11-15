@@ -689,10 +689,13 @@ class SolutionTest extends Specification {
     def "分割等和子集"() {
         expect:
         solution.canPartition(nums) == ans
+        solution.canPartition2(nums) == ans
         where:
         nums                     | ans
         [3, 3, 3, 4, 5] as int[] | true
         [1, 1, 1, 1] as int[]    | true
+        [1, 1, 2, 2] as int[]    | true
+        [1, 2, 5] as int[]       | false
     }
 
     def '接雨点'() {

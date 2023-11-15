@@ -82,9 +82,7 @@ public class Solution {
             if (segments.length != 8) {
                 return "Neither";
             }
-            Set<Character> cSet = new HashSet(Arrays.asList(
-                    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F'
-            ));
+            Set<Character> cSet = new HashSet(Arrays.asList('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F'));
             for (int i = 0; i < segments.length; i++) {
                 String seg = segments[i];
                 if (seg.length() == 0 || seg.length() > 4) {
@@ -312,9 +310,7 @@ public class Solution {
         if (left == null || right == null) {
             return false;
         }
-        return left.val == right.val
-                && isMirror(left.right, right.left)
-                && isMirror(left.left, right.right);
+        return left.val == right.val && isMirror(left.right, right.left) && isMirror(left.left, right.right);
     }
 
     /**
@@ -1242,9 +1238,7 @@ public class Solution {
         int leftHeight = height(root.left);
         int rightHeight = height(root.right);
 
-        return Math.abs(leftHeight - rightHeight) <= 1
-                && isBalanced(root.left)
-                && isBalanced(root.right);
+        return Math.abs(leftHeight - rightHeight) <= 1 && isBalanced(root.left) && isBalanced(root.right);
     }
 
     /**
@@ -2484,6 +2478,12 @@ public class Solution {
         return kq;
     }
 
+    /**
+     * 动态规划，类似背包问题
+     *
+     * @param nums
+     * @return
+     */
     public boolean canPartition(int[] nums) {
         int sum = 0;
         for (int num : nums) {
@@ -2510,6 +2510,43 @@ public class Solution {
             }
         }
         return f[nums.length - 1][target];
+    }
+
+    /**
+     * 动态规划的优化，二维数组变一维数组
+     *
+     * @param nums
+     * @return
+     */
+    public boolean canPartition2(int[] nums) {
+        int n = nums.length;
+        if (n < 2) {
+            return false;
+        }
+        int sum = 0;
+        for (int each : nums) {
+            sum += each;
+        }
+        if ((sum & 1) == 1) {
+            return false;
+        }
+
+        int target = sum / 2;
+        boolean[] dp = new boolean[target + 1];
+        dp[0] = true;
+        if (nums[0] <= target) {
+            dp[nums[0]] = true;
+        }
+
+        for (int i = 1; i < nums.length; i++) {
+            for (int j = target; j > 0 && j >= nums[i]; j--) {
+                dp[j] = dp[j] || dp[j - nums[i]];
+            }
+            if (dp[target]) {
+                return true;
+            }
+        }
+        return dp[target];
     }
 
     public int trap(int[] height) {
