@@ -698,6 +698,14 @@ class SolutionTest extends Specification {
         [1, 2, 5] as int[]       | false
     }
 
+    def '完全平方数'() {
+        expect:
+        solution.numSquares(n) == m
+        where:
+        n  | m
+        12 | 2
+    }
+
     def '接雨点'() {
         expect:
         solution.trap(heights) == ans

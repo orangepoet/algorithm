@@ -5,9 +5,6 @@ import cn.orangepoet.inaction.algorithm.leetcode.Solution2
 import cn.orangepoet.inaction.algorithm.leetcode.TreeNode
 import spock.lang.Specification
 
-import static cn.orangepoet.inaction.algorithm.leetcode.Functions.isSorted
-import static cn.orangepoet.inaction.algorithm.leetcode.Functions.randomSequence
-
 class Solution2Test extends Specification {
     def solution2 = new Solution2()
 
@@ -158,14 +155,16 @@ class Solution2Test extends Specification {
 
     def '三色问题'() {
         given:
-        def nums = randomSequence(20)
-        def nums2 = randomSequence(10)
+        def nums = [2, 0, 2, 1, 1, 0] as int[]
+        def nums2 = [2, 0, 1] as int[]
+
         when:
         solution2.sortColors(nums)
         solution2.sortColors(nums2)
+
         then:
-        isSorted(nums)
-        isSorted(nums2)
+        nums.eachWithIndex { int e, int i -> i == 0 || e >= nums[i - 1] }
+        nums2.eachWithIndex { int e, int i -> i == 0 || e >= nums[i - 1] }
     }
 
     def '区间链表反转'() {

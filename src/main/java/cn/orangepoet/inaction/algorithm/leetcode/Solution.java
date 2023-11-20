@@ -2430,20 +2430,20 @@ public class Solution {
     }
 
     public int numSquares(int n) {
-        int[] ans = new int[n + 1];
-        ans[0] = 0;
+        int[] A = new int[n + 1];
+        A[0] = 0;
         for (int i = 1; i <= n; i++) {
             int min = i;
             for (int j = 1; j < i; j++) {
-                int k = j * j;
-                if (k > i) {
+                int square = j * j;
+                if (square > i) {
                     break;
                 }
-                min = Math.min(min, ans[i - k] + 1);
+                min = Math.min(min, A[i - square] + 1);
             }
-            ans[i] = min;
+            A[i] = min;
         }
-        return ans[n];
+        return A[n];
     }
 
     /**
@@ -2837,5 +2837,59 @@ public class Solution {
             p1.next = p;
         }
         return dump.next;
+    }
+
+    /**
+     * 找到字符串中所有字母异位词
+     *
+     * @param s
+     * @param p
+     * @return
+     */
+    public List<Integer> findAnagrams(String s, String p) {
+        List<Integer> ans = new ArrayList<>();
+        int pLen = p.length();
+        int sLen = s.length();
+
+        if (s.isEmpty() || p.isEmpty() || pLen > sLen) {
+            return ans;
+        }
+        Map<Character, Integer> pMap = new HashMap<>();
+        Map<Character, Integer> sMap = new HashMap<>();
+
+        for (int i = 0; i < pLen; i++) {
+            pMap.compute(p.charAt(i), (k, v) -> v == null ? 1 : v + 1);
+            sMap.compute(s.charAt(i), (k, v) -> v == null ? 1 : v + 1);
+        }
+        if (findAnagrams0(sMap, pMap)) {
+            ans.add(0);
+        }
+
+        for (int i = 1, j = i + pLen - 1; j < sLen; i++, j++) {
+            char remove = s.charAt(i - 1);
+            char add = s.charAt(j);
+
+            sMap.compute(remove, (k, v) -> v == null || v == 1 ? 0 : v - 1);
+            sMap.compute(add, (k, v) -> v == null ? 1 : v + 1);
+            if (sMap.get(remove) == 0) {
+                sMap.remove(remove);
+            }
+            if (findAnagrams0(sMap, pMap)) {
+                ans.add(i);
+            }
+        }
+        return ans;
+    }
+
+    private boolean findAnagrams0(Map<Character, Integer> left, Map<Character, Integer> right) {
+        if (left.size() != right.size()) {
+            return false;
+        }
+        for (Character c : left.keySet()) {
+            if (!Objects.equals(right.getOrDefault(c, -1), left.get(c))) {
+                return false;
+            }
+        }
+        return true;
     }
 }
