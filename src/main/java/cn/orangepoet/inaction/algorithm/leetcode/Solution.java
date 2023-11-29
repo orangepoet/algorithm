@@ -2454,28 +2454,22 @@ public class Solution {
      * @return
      */
     public int[] topKFrequent(int[] nums, int k) {
-        Map<Integer, Integer> occ = new HashMap<>();
-        for (int num : nums) {
-            occ.put(num, occ.getOrDefault(num, 0) + 1);
-        }
-        PriorityQueue<int[]> queue = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));
-        for (Integer num : occ.keySet()) {
-            int cnt = occ.get(num);
+        Map<Integer, Integer> freq = new HashMap<>();
 
-            if (queue.size() == k) {
-                if (queue.peek()[1] < cnt) {
-                    queue.poll();
-                    queue.offer(new int[]{num, cnt});
-                }
-            } else {
-                queue.offer(new int[]{num, cnt});
-            }
+        for (int n : nums) {
+            freq.put(n, freq.getOrDefault(n, 0) + 1);
         }
-        int[] kq = new int[k];
-        for (int i = 0; i < kq.length; i++) {
-            kq[i] = queue.poll()[0];
+
+        PriorityQueue<int[]> pq = new PriorityQueue<>(k, (a, b) -> -1 * Integer.compare(a[1], b[1]));
+        for (int key : freq.keySet()) {
+            pq.offer(new int[]{key, freq.get(key)});
         }
-        return kq;
+
+        int[] ret = new int[k];
+        for (int i = 0; i < k; i++) {
+            ret[i] = pq.poll()[0];
+        }
+        return ret;
     }
 
     /**

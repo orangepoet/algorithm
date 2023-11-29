@@ -215,6 +215,7 @@ class SolutionTest extends Specification {
 
         expect:
         solution.subarraySum(nums, k) == ans
+        solution.subarraySum2(nums, k) == ans
 
         where:
         nums                     | k | ans
@@ -793,5 +794,15 @@ class SolutionTest extends Specification {
         ListNode.create([1, 2, 3, 3, 4, 4, 5] as int[]) | ListNode.create([1, 2, 5] as int[])
         ListNode.create([1, 1, 1, 2, 3] as int[])       | ListNode.create([2, 3] as int[])
         ListNode.create([1, 2, 2] as int[])             | ListNode.create([1] as int[])
+    }
+
+    def "前 K 个高频元素"() {
+        expect:
+        solution.topKFrequent(nums, k) == ans
+
+        where:
+        nums                        | k | ans
+        [1, 1, 1, 2, 2, 3] as int[] | 2 | [1, 2] as int[]
+        [1] as int[]                | 1 | [1] as int[]
     }
 }
